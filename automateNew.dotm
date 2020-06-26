@@ -1,0 +1,470 @@
+' Author: Kegan Wong
+'----------------------------------------------------------------------------------------------------------------------------------
+' Email: kmw037@ucsd.edu
+'----------------------------------------------------------------------------------------------------------------------------------
+' Description: Automates creating three 59x3 tables,and populates each table cell with pictures of lab results in ascending order.
+'              Each table contains separate tests (test 3, test 4, test 5) based on temperature. For MAC users, also automates the
+'              file permissions needed to input photos in Microsoft Word.
+'----------------------------------------------------------------------------------------------------------------------------------
+' Tools: Visual Basic, Visual Basic for Applications (VBA) , Macros
+'----------------------------------------------------------------------------------------------------------------------------------
+' Notes: If used in the future, simply change the dimension of the tables, the path to the folder(s) containing the pictures, and
+'        the strings related to the picture name.
+'----------------------------------------------------------------------------------------------------------------------------------
+
+Sub AutomateTable()
+
+'
+' The Macro used to automate the creation of each table and populate them.
+'
+
+'data types
+'
+'row is used to track the specific row during each iteration
+'
+'col is used to track the specifc column during each iteration
+'
+'iteration is used to track the iteration number in the nested for loop
+'
+'holdUnitNum is used to hold onto the number cooresponding to the string unit (there are 11 units total, each a directory)
+'numRows specifies the number of rows for each table when initializing it
+'
+'holdTestNum is used to store the test of the picture (either 3, 4, 5)
+'
+'numColumns specifies the number of columns for each table when initializing it
+'
+'individualPicStr is an array that holds all suffixes that each test shares in common
+'
+'imageOfTest is the picture to be inserted in each table cell
+'
+'objShape is used to help rotate imageOfTest, the picture
+'
+'newTable is the table that stores the photos of the lab results
+
+    Dim row As Integer
+    Dim col As Integer
+    Dim iteration As Integer
+    Dim holdUnitNum As Integer
+    Dim holdTestNum As Integer
+    Dim tableNum As Integer
+    Dim tableCounter As Integer
+    
+
+    Dim numRows As Long
+    Dim numColumns As Long
+
+    Dim holdVoltageStr As String
+    Dim holdSerialStr As String
+    Dim holdTempStr As String
+   
+    Dim titleSerialStr As String
+    Dim titleTempStr As String
+    Dim titleVoltStr As String
+
+    Dim individualAmpStr(16) As String
+
+    Dim imageOfTest As InlineShape
+    Dim objShape As Shape
+    Dim rangeObj As Range
+
+
+'specify the table size (row x col)
+
+    numRows = 16
+    numColumns = 3
+
+'specify the suffixes shared in each picture
+
+    individualAmpStr(0) = "0.5mA"
+    individualAmpStr(1) = "1mA"
+    individualAmpStr(2) = "2mA"
+    individualAmpStr(3) = "3mA"
+    individualAmpStr(4) = "4mA"
+    individualAmpStr(5) = "5mA"
+    individualAmpStr(6) = "6mA"
+    individualAmpStr(7) = "7mA"
+    individualAmpStr(8) = "8mA"
+    individualAmpStr(9) = "9mA"
+    individualAmpStr(10) = "10mA"
+    individualAmpStr(11) = "11mA"
+    individualAmpStr(12) = "12mA"
+    individualAmpStr(13) = "13mA"
+    individualAmpStr(14) = "14mA"
+    individualAmpStr(15) = "15mA"
+    
+'creates empty table, with dimension numRows x numColumns
+
+    For tableCounter = 1 To 11
+
+
+    titleSerialStr = getSerialNum(tableCounter)
+    titleTempStr = getTempStr(tableCounter)
+    titleVoltStr = getVoltageStr(tableCounter)
+
+
+    Selection.TypeText Text:="   " & titleSerialStr & ": " & titleTempStr & ", " & titleVoltStr
+    ActiveDocument.Tables.Add Selection.Range, numRows, numColumns
+
+    Selection.MoveDown Unit:=wdLine, count:=17
+    Selection.TypeParagraph
+
+    Next
+    
+
+    
+'insert lab results in each cell, all test 3s, 2.7V
+' for voltage string, it is determined by deviceNum! so for 1-11, its 2.7V, 12-22 its 3.0V, and for 23-33 its 3.2V
+    GrantAccess
+
+    For tableNum = 1 To 11
+   
+    iteration = 0
+
+    With ActiveDocument.Tables(tableNum)
+
+    For row = 1 To 16
+    For col = 1 To 3
+
+'finds the corresponding unit number based on the iteration, and uses this number to get the cooresponding unit string (used for path)
+
+    holdTestNum = getTestNum(iteration)
+    holdVoltageStr = getVoltageStr(tableNum)
+    holdUnitStr = getUnitStr(tableNum)
+    holdSerialStr = getSerialNum(tableNum)
+    holdTempStr = getTempStr(tableNum)
+    
+        
+'labels the picture with a string
+    .Cell(row, col).Range.InsertAfter holdSerialStr & ": " & holdTempStr & "," & holdVoltageStr & "," & individualAmpStr(iteration Mod 16)
+
+'initial insert of the picture in the cell
+    
+    Set imageOfTest = .Cell(row, col).Range.InlineShapes.AddPicture("/Users/k3go/Desktop/BackUp37/" & holdUnitStr & "/" & holdVoltageStr & "/" & holdTestNum & "." & tableNum & " " & holdVoltageStr & " " & individualAmpStr(iteration Mod 16) & ".TIF")
+
+'rotates the picture from vertical to horizontal
+
+
+    Set objShape = imageOfTest.ConvertToShape
+    objShape.IncrementRotation (90)
+
+    objShape.Width = 119.52
+    objShape.Height = 143.28
+    
+    Set imageOfTest = objShape.ConvertToInlineShape
+     
+    iteration = iteration + 1
+
+    Next
+    Next
+
+ '   ActiveDocument.Tables(tableNum).Columns.Width = 200
+ '   ActiveDocument.Tables(tableNum).Rows.Alignment = wdAlignRowCenter
+  
+      
+    End With
+
+    Next
+    
+
+'since portions of the picture are cut off and overlap, adjust width to reveal the rest; align table to center to fix any cutoffs
+
+'    device1.Columns.Width = 200
+'    device1.Rows.Alignment = wdAlignRowCenter
+'    do with individual tables upon completion
+
+End Sub
+
+
+
+
+'--------------------------------------------------------------------------------------------------------------------------------
+
+
+Sub GrantAccess()
+'
+' For MAC users, this macro helps in giving multiple file permissions at once, rather than for each photo
+'
+
+'data types
+'
+'fileAccess is a boolean that helps in giving file permissions
+'
+'fileCandidates is an array that stores all the picture names that require file permissions
+'
+'picStr is an array that stores all the picture names
+'
+'count helps obtain the correct number of pictures
+'
+'unitNum is number corresponding to the string unit
+'
+'unitString is the name of the unit
+
+    Dim fileAccess As Boolean
+    Dim fileCandidates(528) As String
+    Dim picStr(16) As String
+    Dim count As Integer
+    Dim unitNum As Integer
+    Dim unitStr As String
+    Dim voltStr As String
+
+    Dim tableN As Integer
+    Dim iter As Integer
+    Dim r As Integer
+    Dim c As Integer
+    
+
+    picStr(0) = "0.5mA.TIF"
+    picStr(1) = "1mA.TIF"
+    picStr(2) = "2mA.TIF"
+    picStr(3) = "3mA.TIF"
+    picStr(4) = "4mA.TIF"
+    picStr(5) = "5mA.TIF"
+    picStr(6) = "6mA.TIF"
+    picStr(7) = "7mA.TIF"
+    picStr(8) = "8mA.TIF"
+    picStr(9) = "9mA.TIF"
+    picStr(10) = "10mA.TIF"
+    picStr(11) = "11mA.TIF"
+    picStr(12) = "12mA.TIF"
+    picStr(13) = "13mA.TIF"
+    picStr(14) = "14mA.TIF"
+    picStr(15) = "15mA.TIF"
+
+'obtain all the file names of interest to grant permission in one click
+
+
+    For tableN = 1 To 11
+   
+    iter = 0
+
+
+    For r = 1 To 16
+    For c = 1 To 3
+
+'finds the corresponding unit number based on the iteration, and uses this number to get the cooresponding unit string (used for path)
+
+    unitNum = getTestNum(iter)
+    voltStr = getVoltageStr(tableN)
+    unitStr = getUnitStr(tableN)
+
+    fileCandidates(count) = "/Users/k3go/Desktop/BackUp37/" & unitStr & "/" & voltStr & "/" & unitNum & "." & tableN & " " & voltStr & " " & picStr(iter Mod 16)
+    iter = iter + 1
+    count = count + 1
+    
+    Next
+    Next
+    Next
+       
+   fileAccess = GrantAccessToMultipleFiles(fileCandidates)
+
+    
+End Sub
+
+
+Function getTestNum(iteration As Integer) As Integer
+
+'
+'function that determines the test number based on the iteration in subroutine automate table
+'param: iteration is the current cycle in the loop used in automate table
+'
+
+    Dim holdTest As Integer
+    
+    If iteration <= 15 Then
+    holdTest = 3
+
+    ElseIf iteration <= 31 Then
+    holdTest = 4
+
+    Else
+    holdTest = 5
+
+    End If
+    
+    getTestNum = holdTest
+
+End Function
+
+
+Function getVoltageStr(tableNum As Integer) As String
+
+    Dim holdVoltStr As String
+    
+    If tableNum <= 11 Then
+    holdVoltStr = "2.7V"
+    
+    ElseIf tableNum <= 22 Then
+    holdVoltStr = "3.0V"
+
+    Else
+    holdVoltStr = "3.2V"
+
+    End If
+    
+    getVoltageStr = holdVoltStr
+
+End Function
+
+   
+
+Function getUnitNum(iteration As Integer) As Integer
+
+'
+'function that determines the unit number based on the iteration in subroutine automate table
+'param: iteration is the current cycle in the loop used in automate table
+'
+
+    
+    Dim holdNum As Integer
+
+    If iteration <= 15 Then
+    holdNum = 1
+
+    ElseIf iteration <= 31 Then
+    holdNum = 2
+
+    ElseIf iteration <= 47 Then
+    holdNum = 3
+
+    ElseIf iteration <= 63 Then
+    holdNum = 4
+
+    ElseIf iteration <= 79 Then
+    holdNum = 5
+
+    ElseIf iteration <= 95 Then
+    holdNum = 6
+
+    ElseIf iteration <= 111 Then
+    holdNum = 7
+
+    ElseIf iteration <= 127 Then
+    holdNum = 8
+
+    ElseIf iteration <= 143 Then
+    holdNum = 9
+
+    ElseIf iteration <= 159 Then
+    holdNum = 10
+
+    Else
+    holdNum = 11
+
+    End If
+
+    getUnitNum = holdNum
+
+End Function
+
+Function getUnitStr(unitNum As Integer) As String
+
+'
+'function that determines the unit string based on the iteration in subroutine automate table
+'param: unitNum is the unit number that is returned from getUnitNum(iteration)
+'
+
+    Dim holdStr As String
+
+    If unitNum = 1 Then
+    holdStr = "Unit 1"
+    
+    ElseIf unitNum = 2 Then
+    holdStr = "Unit 2"
+
+    ElseIf unitNum = 3 Then
+    holdStr = "Unit 3"
+    
+    ElseIf unitNum = 4 Then
+    holdStr = "Unit 4"
+    
+    ElseIf unitNum = 5 Then
+    holdStr = "Unit 5"
+
+    ElseIf unitNum = 6 Then
+    holdStr = "Unit 6"
+
+    ElseIf unitNum = 7 Then
+    holdStr = "Unit 7"
+    
+    ElseIf unitNum = 8 Then
+    holdStr = "Unit 8"
+
+    ElseIf unitNum = 9 Then
+    holdStr = "Unit 9"
+    
+    ElseIf unitNum = 10 Then
+    holdStr = "Unit 10"
+
+    Else
+    holdStr = "Unit 11"
+
+    End If
+
+    getUnitStr = holdStr
+   
+End Function
+
+Function getSerialNum(tableNum As Integer) As String
+
+    Dim serial As String
+
+    If tableNum = 1 Then
+    serial = "000654"
+
+    ElseIf tableNum = 2 Then
+    serial = "000655"
+
+    ElseIf tableNum = 3 Then
+    serial = "000656"
+    
+    ElseIf tableNum = 4 Then
+    serial = "000657"
+
+    ElseIf tableNum = 5 Then
+    serial = "000658"
+
+    ElseIf tableNum = 6 Then
+    serial = "000659"
+
+    ElseIf tableNum = 7 Then
+    serial = "000660"
+
+    ElseIf tableNum = 8 Then
+    serial = "000661"
+
+    ElseIf tableNum = 9 Then
+    serial = "000662"
+
+    ElseIf tableNum = 10 Then
+    serial = "000663"
+
+    Else
+    serial = "000664"
+
+    End If
+
+    getSerialNum = serial
+    
+
+End Function
+
+
+Function getTempStr(tableNum As Integer) As String
+    
+    Dim temp As String
+    
+    If tableNum <= 33 Then
+    temp = "37°C"
+
+    ElseIf tableNum <= 66 Then
+    temp = "45°C"
+
+    Else
+    temp = "20°C"
+    
+    End If
+
+    getTempStr = temp
+        
+End Function
+
