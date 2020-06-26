@@ -1,3 +1,5 @@
+
+
 ' Author: Kegan Wong
 '----------------------------------------------------------------------------------------------------------------------------------
 ' Email: kmw037@ucsd.edu
@@ -48,14 +50,18 @@ Sub AutomateTable()
     Dim holdTestNum As Integer
     Dim tableNum As Integer
     Dim tableCounter As Integer
+    Dim spaceTable As Integer
     
 
     Dim numRows As Long
     Dim numColumns As Long
 
+    Dim holdFolderStr As String
+    Dim holdUnitStr As String
     Dim holdVoltageStr As String
     Dim holdSerialStr As String
     Dim holdTempStr As String
+   
    
     Dim titleSerialStr As String
     Dim titleTempStr As String
@@ -104,8 +110,7 @@ Sub AutomateTable()
     Selection.TypeText Text:="   " & titleSerialStr & ": " & titleTempStr & ", " & titleVoltStr
     ActiveDocument.Tables.Add Selection.Range, numRows, numColumns
 
-    Selection.MoveDown Unit:=wdLine, count:=17
-    Selection.TypeParagraph
+    Selection.MoveDown unit:=wdLine, count:=17
 
     Next
     
@@ -113,9 +118,12 @@ Sub AutomateTable()
     
 'insert lab results in each cell, all test 3s, 2.7V
 ' for voltage string, it is determined by deviceNum! so for 1-11, its 2.7V, 12-22 its 3.0V, and for 23-33 its 3.2V
-    GrantAccess
 
-    For tableNum = 1 To 11
+
+'    GrantAccess
+
+
+    For tableNum = 1 To 33
    
     iteration = 0
 
@@ -126,19 +134,26 @@ Sub AutomateTable()
 
 'finds the corresponding unit number based on the iteration, and uses this number to get the cooresponding unit string (used for path)
 
+    
     holdTestNum = getTestNum(iteration)
+    holdFolderStr = getDegreeFolder(tableNum)
     holdVoltageStr = getVoltageStr(tableNum)
-    holdUnitStr = getUnitStr(tableNum)
-    holdSerialStr = getSerialNum(tableNum)
     holdTempStr = getTempStr(tableNum)
+
+    holdSerialStr = getSerialNum(tableNum)
+    holdUnitStr = getUnitStr(holdSerialStr)
+    holdUnitNum = getUnitNum(holdUnitStr)
+
+
+
     
         
 'labels the picture with a string
-    .Cell(row, col).Range.InsertAfter holdSerialStr & ": " & holdTempStr & "," & holdVoltageStr & "," & individualAmpStr(iteration Mod 16)
+    .Cell(row, col).Range.InsertAfter holdSerialStr & ": " & holdTempStr & ", " & holdVoltageStr & ", " & individualAmpStr(iteration Mod 16)
 
 'initial insert of the picture in the cell
-    
-    Set imageOfTest = .Cell(row, col).Range.InlineShapes.AddPicture("/Users/k3go/Desktop/BackUp37/" & holdUnitStr & "/" & holdVoltageStr & "/" & holdTestNum & "." & tableNum & " " & holdVoltageStr & " " & individualAmpStr(iteration Mod 16) & ".TIF")
+    Debug.Print ("/Users/k3go/Desktop/BackUp37/" & holdUnitStr & "/" & holdVoltageStr & "/" & holdTestNum & "." & holdUnitNum & " " & holdVoltageStr & " " & individualAmpStr(iteration Mod 16) & ".TIF")
+    Set imageOfTest = .Cell(row, col).Range.InlineShapes.AddPicture("/Users/k3go/Desktop/BackUp37/" & holdUnitStr & "/" & holdVoltageStr & "/" & holdTestNum & "." & holdUnitNum & " " & holdVoltageStr & " " & individualAmpStr(iteration Mod 16) & ".TIF")
 
 'rotates the picture from vertical to horizontal
 
@@ -200,12 +215,18 @@ Sub GrantAccess()
 'unitString is the name of the unit
 
     Dim fileAccess As Boolean
-    Dim fileCandidates(528) As String
+    Dim fileCandidates(1584) As String
     Dim picStr(16) As String
+
+
     Dim count As Integer
+    
+    Dim testNum As Integer
     Dim unitNum As Integer
     Dim unitStr As String
     Dim voltStr As String
+    Dim serialStr As String
+    
 
     Dim tableN As Integer
     Dim iter As Integer
@@ -233,7 +254,7 @@ Sub GrantAccess()
 'obtain all the file names of interest to grant permission in one click
 
 
-    For tableN = 1 To 11
+    For tableN = 1 To 33
    
     iter = 0
 
@@ -243,11 +264,17 @@ Sub GrantAccess()
 
 'finds the corresponding unit number based on the iteration, and uses this number to get the cooresponding unit string (used for path)
 
-    unitNum = getTestNum(iter)
+    serialStr = getSerialNum(tableN)
+    unitStr = getUnitStr(serialStr)
+    unitNum = getUnitNum(unitStr)
+    
     voltStr = getVoltageStr(tableN)
-    unitStr = getUnitStr(tableN)
+    testNum = getTestNum(iter)
 
-    fileCandidates(count) = "/Users/k3go/Desktop/BackUp37/" & unitStr & "/" & voltStr & "/" & unitNum & "." & tableN & " " & voltStr & " " & picStr(iter Mod 16)
+   
+
+    fileCandidates(count) = "/Users/k3go/Desktop/BackUp37/" & unitStr & "/" & voltStr & "/" & testNum & "." & unitNum & " " & voltStr & " " & picStr(iter Mod 16)
+    Debug.Print (fileCandidates(count))
     iter = iter + 1
     count = count + 1
     
@@ -290,15 +317,18 @@ Function getVoltageStr(tableNum As Integer) As String
 
     Dim holdVoltStr As String
     
-    If tableNum <= 11 Then
+    If (tableNum >= 1 And tableNum <= 11) Or (tableNum >= 34 And tableNum <= 44) Or (tableNum >= 67 And tableNum <= 77) Then
     holdVoltStr = "2.7V"
     
-    ElseIf tableNum <= 22 Then
+    ElseIf (tableNum >= 12 And tableNum <= 22) Or (tableNum >= 45 And tableNum <= 55) Or (tableNum >= 78 And tableNum <= 88) Then
     holdVoltStr = "3.0V"
 
-    Else
+    ElseIf (tableNum >= 23 And tableNum <= 33) Or (tableNum >= 56 And tableNum <= 66) Or (tableNum >= 89 And tableNum <= 99) Then
     holdVoltStr = "3.2V"
 
+    Else
+    holdVoltageStr = "Error"
+    
     End If
     
     getVoltageStr = holdVoltStr
@@ -306,102 +336,6 @@ Function getVoltageStr(tableNum As Integer) As String
 End Function
 
    
-Function getUnitNum(iteration As Integer) As Integer
-
-'
-'function that determines the unit number based on the iteration in subroutine automate table
-'param: iteration is the current cycle in the loop used in automate table
-'
-
-    
-    Dim holdNum As Integer
-
-    If iteration <= 15 Then
-    holdNum = 1
-
-    ElseIf iteration <= 31 Then
-    holdNum = 2
-
-    ElseIf iteration <= 47 Then
-    holdNum = 3
-
-    ElseIf iteration <= 63 Then
-    holdNum = 4
-
-    ElseIf iteration <= 79 Then
-    holdNum = 5
-
-    ElseIf iteration <= 95 Then
-    holdNum = 6
-
-    ElseIf iteration <= 111 Then
-    holdNum = 7
-
-    ElseIf iteration <= 127 Then
-    holdNum = 8
-
-    ElseIf iteration <= 143 Then
-    holdNum = 9
-
-    ElseIf iteration <= 159 Then
-    holdNum = 10
-
-    Else
-    holdNum = 11
-
-    End If
-
-    getUnitNum = holdNum
-
-End Function
-
-Function getUnitStr(unitNum As Integer) As String
-
-'
-'function that determines the unit string based on the iteration in subroutine automate table
-'param: unitNum is the unit number that is returned from getUnitNum(iteration)
-'
-
-    Dim holdStr As String
-
-    If unitNum = 1 Then
-    holdStr = "Unit 1"
-    
-    ElseIf unitNum = 2 Then
-    holdStr = "Unit 2"
-
-    ElseIf unitNum = 3 Then
-    holdStr = "Unit 3"
-    
-    ElseIf unitNum = 4 Then
-    holdStr = "Unit 4"
-    
-    ElseIf unitNum = 5 Then
-    holdStr = "Unit 5"
-
-    ElseIf unitNum = 6 Then
-    holdStr = "Unit 6"
-
-    ElseIf unitNum = 7 Then
-    holdStr = "Unit 7"
-    
-    ElseIf unitNum = 8 Then
-    holdStr = "Unit 8"
-
-    ElseIf unitNum = 9 Then
-    holdStr = "Unit 9"
-    
-    ElseIf unitNum = 10 Then
-    holdStr = "Unit 10"
-
-    Else
-    holdStr = "Unit 11"
-
-    End If
-
-    getUnitStr = holdStr
-   
-End Function
 
 Function getSerialNum(tableNum As Integer) As String
 
@@ -441,7 +375,7 @@ Function getSerialNum(tableNum As Integer) As String
     serial = "000664"
 
     Else
-    serial = "N/A"
+    serial = "Error"
     
     End If
 
@@ -471,3 +405,114 @@ Function getTempStr(tableNum As Integer) As String
 End Function
 
 
+Function getUnitStr(serial As String) As String
+
+    Dim unit As String
+    
+    If serial = "000654" Then
+    unit = "Unit 1"
+
+    ElseIf serial = "000655" Then
+    unit = "Unit 2"
+    
+    ElseIf serial = "000656" Then
+    unit = "Unit 3"
+
+    ElseIf serial = "000657" Then
+    unit = "Unit 4"
+    
+    ElseIf serial = "000658" Then
+    unit = "Unit 5"
+
+    ElseIf serial = "000659" Then
+    unit = "Unit 6"
+    
+    ElseIf serial = "000660" Then
+    unit = "Unit 7"
+
+    ElseIf serial = "000661" Then
+    unit = "Unit 8"
+    
+    ElseIf serial = "000662" Then
+    unit = "Unit 9"
+
+    ElseIf serial = "000663" Then
+    unit = "Unit 10"
+    
+    ElseIf serial = "000664" Then
+    unit = "Unit 11"
+
+    Else
+    unit = "Error"
+
+    End If
+
+    getUnitStr = unit
+
+End Function
+
+Function getUnitNum(unitS As String) As Integer
+
+    Dim unitNumber As Integer
+
+    If unitS = "Unit 1" Then
+    unitNumber = 1
+    
+    ElseIf unitS = "Unit 2" Then
+    unitNumber = 2
+
+    ElseIf unitS = "Unit 3" Then
+    unitNumber = 3
+
+    ElseIf unitS = "Unit 4" Then
+    unitNumber = 4
+
+    ElseIf unitS = "Unit 5" Then
+    unitNumber = 5
+
+    ElseIf unitS = "Unit 6" Then
+    unitNumber = 6
+
+    ElseIf unitS = "Unit 7" Then
+    unitNumber = 7
+
+    ElseIf unitS = "Unit 8" Then
+    unitNumber = 8
+
+    ElseIf unitS = "Unit 9" Then
+    unitNumber = 9
+
+    ElseIf unitS = "Unit 10" Then
+    unitNumber = 10
+
+    ElseIf unitS = "Unit 11" Then
+    unitNumber = 11
+
+    Else
+    unitNumber = -1
+
+    End If
+    
+    getUnitNum = unitNumber
+
+End Function
+
+Function getDegreeFolder(tableNum As Integer) As String
+
+    Dim tableFolderStr As String
+
+    If tableNum <= 33 Then
+    tableFolderStr = "BackUp37"
+
+    ElseIf tableNum <= 66 Then
+    tableFolderStr = "BackUp45"
+   
+    Else
+    tableFolderStr = "BackUp20"
+
+    End If
+
+    getDegreeFolder = tableFolderStr
+
+End Function
+            
