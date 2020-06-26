@@ -94,8 +94,7 @@ Sub AutomateTable()
     
 'creates empty table, with dimension numRows x numColumns
 
-    For tableCounter = 1 To 11
-
+    For tableCounter = 1 To 33
 
     titleSerialStr = getSerialNum(tableCounter)
     titleTempStr = getTempStr(tableCounter)
@@ -156,6 +155,7 @@ Sub AutomateTable()
 
     Next
     Next
+
 
  '   ActiveDocument.Tables(tableNum).Columns.Width = 200
  '   ActiveDocument.Tables(tableNum).Rows.Alignment = wdAlignRowCenter
@@ -306,7 +306,6 @@ Function getVoltageStr(tableNum As Integer) As String
 End Function
 
    
-
 Function getUnitNum(iteration As Integer) As Integer
 
 '
@@ -408,39 +407,42 @@ Function getSerialNum(tableNum As Integer) As String
 
     Dim serial As String
 
-    If tableNum = 1 Then
+    If tableNum = 1 Or tableNum = 12 Or tableNum = 23 Or tableNum = 34 Or tableNum = 45 Or tableNum = 56 Or tableNum = 67 Or tableNum = 78 Or tableNum = 89 Then
     serial = "000654"
 
-    ElseIf tableNum = 2 Then
+    ElseIf tableNum = 2 Or tableNum = 13 Or tableNum = 24 Or tableNum = 35 Or tableNum = 46 Or tableNum = 57 Or tableNum = 68 Or tableNum = 79 Or tableNum = 90 Then
     serial = "000655"
 
-    ElseIf tableNum = 3 Then
+    ElseIf tableNum = 3 Or tableNum = 14 Or tableNum = 25 Or tableNum = 36 Or tableNum = 47 Or tableNum = 58 Or tableNum = 69 Or tableNum = 80 Or tableNum = 91 Then
     serial = "000656"
     
-    ElseIf tableNum = 4 Then
+    ElseIf tableNum = 4 Or tableNum = 15 Or tableNum = 26 Or tableNum = 37 Or tableNum = 48 Or tableNum = 59 Or tableNum = 70 Or tableNum = 81 Or tableNum = 92 Then
     serial = "000657"
 
-    ElseIf tableNum = 5 Then
+    ElseIf tableNum = 5 Or tableNum = 16 Or tableNum = 27 Or tableNum = 38 Or tableNum = 49 Or tableNum = 60 Or tableNum = 71 Or tableNum = 82 Or tableNum = 93 Then
     serial = "000658"
 
-    ElseIf tableNum = 6 Then
+    ElseIf tableNum = 6 Or tableNum = 17 Or tableNum = 28 Or tableNum = 39 Or tableNum = 50 Or tableNum = 61 Or tableNum = 72 Or tableNum = 83 Or tableNum = 94 Then
     serial = "000659"
 
-    ElseIf tableNum = 7 Then
+    ElseIf tableNum = 7 Or tableNum = 18 Or tableNum = 29 Or tableNum = 40 Or tableNum = 51 Or tableNum = 62 Or tableNum = 73 Or tableNum = 84 Or tableNum = 95 Then
     serial = "000660"
 
-    ElseIf tableNum = 8 Then
+    ElseIf tableNum = 8 Or tableNum = 19 Or tableNum = 30 Or tableNum = 41 Or tableNum = 52 Or tableNum = 63 Or tableNum = 74 Or tableNum = 85 Or tableNum = 96 Then
     serial = "000661"
 
-    ElseIf tableNum = 9 Then
+    ElseIf tableNum = 9 Or tableNum = 20 Or tableNum = 31 Or tableNum = 42 Or tableNum = 53 Or tableNum = 64 Or tableNum = 75 Or tableNum = 86 Or tableNum = 97 Then
     serial = "000662"
 
-    ElseIf tableNum = 10 Then
+    ElseIf tableNum = 10 Or tableNum = 21 Or tableNum = 32 Or tableNum = 43 Or tableNum = 54 Or tableNum = 65 Or tableNum = 76 Or tableNum = 87 Or tableNum = 98 Then
     serial = "000663"
 
-    Else
+    ElseIf tableNum = 11 Or tableNum = 22 Or tableNum = 33 Or tableNum = 44 Or tableNum = 55 Or tableNum = 66 Or tableNum = 77 Or tableNum = 88 Or tableNum = 99 Then
     serial = "000664"
 
+    Else
+    serial = "N/A"
+    
     End If
 
     getSerialNum = serial
@@ -467,4 +469,5 @@ Function getTempStr(tableNum As Integer) As String
     getTempStr = temp
         
 End Function
+
 
