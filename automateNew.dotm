@@ -126,7 +126,9 @@ Sub AutomateTables()
 ' for voltage string, it is determined by deviceNum! so for 1-11, its 2.7V, 12-22 its 3.0V, and for 23-33 its 3.2V
 
 
+
     GrantAccess
+
 
 
     For tableNum = 1 To 297
@@ -156,22 +158,23 @@ Sub AutomateTables()
     Else
         
 'labels the picture with a string
-    .Cell(row, col).Range.InsertAfter holdSerialStr & ": " & holdTempStr & ", " & holdVoltageStr & ", " & individualAmpStr(iteration Mod 16)
+    '.Cell(row, col).Range.InsertAfter holdSerialStr & ": " & holdTempStr & ", " & holdVoltageStr & ", " & individualAmpStr(iteration Mod 16)
 
 'initial insert of the picture in the cell
     Debug.Print ("/Users/k3go/Desktop/BackUp/" & holdFolderStr & "/" & holdUnitStr & "/" & holdVoltageStr & "/" & holdTestNum & "." & holdUnitNum & " " & holdVoltageStr & " " & individualAmpStr(iteration Mod 16) & ".TIF")
-    Set imageOfTest = .Cell(row, col).Range.InlineShapes.AddPicture("/Users/k3go/Desktop/BackUp/" & holdFolderStr & "/" & holdUnitStr & "/" & holdVoltageStr & "/" & holdTestNum & "." & holdUnitNum & " " & holdVoltageStr & " " & individualAmpStr(iteration Mod 16) & ".TIF")
+    'Set imageOfTest = .Cell(row, col).Range.InlineShapes.AddPicture("/Users/k3go/Desktop/BackUp/" & holdFolderStr & "/" & holdUnitStr & "/" & holdVoltageStr & "/" & holdTestNum & "." & holdUnitNum & " " & holdVoltageStr & " " & individualAmpStr(iteration Mod 16) & ".TIF")
 
 'rotates the picture from vertical to horizontal
 
 
-    Set objShape = imageOfTest.ConvertToShape
-    objShape.IncrementRotation (90)
+    'Set objShape = imageOfTest.ConvertToShape
+    'objShape.IncrementRotation (90)
 
-    objShape.Width = 119.52
-    objShape.Height = 143.28
+    'objShape.Width = 119.52
+    'objShape.Height = 143.28
     
-    Set imageOfTest = objShape.ConvertToInlineShape
+    'Set imageOfTest = objShape.ConvertToInlineShape
+
      
     iteration = iteration + 1
 
@@ -295,7 +298,7 @@ Sub GrantAccess()
 End Sub
 
 
-Function getTestNum(iteration As Integer) As Integer
+Function getTestNum(tableNum As Integer) As Integer
 
 '
 'function that determines the test number based on the iteration in subroutine automate table
@@ -304,10 +307,10 @@ Function getTestNum(iteration As Integer) As Integer
 
     Dim holdTest As Integer
     
-    If iteration <= 15 Then
+    If (tableNum >= 1 And tableNum <= 11) Or (tableNum >= 34 And tablenNum <= 44) Or (tableNum >= 67 And tableNum <= 77) Or (tableNum >= 100 And tableNum <= 110) Or (tableNum >= 133 And tableNum <= 143) Or (tableNum >= 166 And tableNum <= 176) Or (tableNum >= 199 And tableNum <= 209) Or (tableNum >= 232 And tableNum <= 242) Or (tableNum >= 265 And tableNum <= 275) Then
     holdTest = 3
 
-    ElseIf iteration <= 31 Then
+    ElseIf (tableNum >= 12 And tableNum <= 22) Or (tableNum >= 45 And tablenNum <= 55) Or (tableNum >= 78 And tableNum <= 88) Or (tableNum >= 111 And tableNum <= 121) Or (tableNum >= 144 And tableNum <= 154) Or (tableNum >= 177 And tableNum <= 187) Or (tableNum >= 210 And tableNum <= 220) Or (tableNum >= 243 And tableNum <= 253) Or (tableNum >= 276 And tableNum <= 286) Then
     holdTest = 4
 
     Else
@@ -522,3 +525,4 @@ Function getDegreeFolder(tableNum As Integer) As String
     getDegreeFolder = tableFolderStr
 
 End Function
+
