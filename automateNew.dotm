@@ -1,3 +1,5 @@
+
+
 ' Author: Kegan Wong
 '----------------------------------------------------------------------------------------------------------------------------------
 ' Email: kmw037@ucsd.edu
@@ -12,7 +14,7 @@
 '        the strings related to the picture name.
 '----------------------------------------------------------------------------------------------------------------------------------
 
-Sub AutomateTable()
+Sub AutomateTables()
 
 '
 ' The Macro used to automate the creation of each table and populate them.
@@ -74,7 +76,7 @@ Sub AutomateTable()
 
 'specify the table size (row x col)
 
-    numRows = 16
+    numRows = 6
     numColumns = 3
 
 'specify the suffixes shared in each picture
@@ -98,7 +100,7 @@ Sub AutomateTable()
     
 'creates empty table, with dimension numRows x numColumns
 
-    For tableCounter = 1 To 99
+    For tableCounter = 1 To 297
 
     titleSerialStr = getSerialNum(tableCounter)
     titleTempStr = getTempStr(tableCounter)
@@ -108,9 +110,9 @@ Sub AutomateTable()
     Selection.TypeText Text:="   " & titleSerialStr & ": " & titleTempStr & ", " & titleVoltStr
     ActiveDocument.Tables.Add Selection.Range, numRows, numColumns
 
-    Selection.MoveDown unit:=wdLine, count:=17
+    Selection.MoveDown unit:=wdLine, count:=7
 
-    For spaceTable = 1 To 7
+    For spaceTable = 1 To 25
     
     Selection.TypeParagraph
     
@@ -127,16 +129,16 @@ Sub AutomateTable()
     GrantAccess
 
 
-    For tableNum = 1 To 99
+    For tableNum = 1 To 297
    
     iteration = 0
 
     With ActiveDocument.Tables(tableNum)
 
-    For row = 1 To 16
+    For row = 1 To 6
     For col = 1 To 3
 
-'finds the corresponding unit number based on the iteration, and uses this number to get the corresponding unit string (used for path)
+'finds the corresponding unit number based on the iteration, and uses this number to get the cooresponding unit string (used for path)
 
     
     holdTestNum = getTestNum(iteration)
@@ -147,9 +149,13 @@ Sub AutomateTable()
     holdSerialStr = getSerialNum(tableNum)
     holdUnitStr = getUnitStr(holdSerialStr)
     holdUnitNum = getUnitNum(holdUnitStr)
-    
+
+    If iteration >= 16 Then
+    .Cell(row, col).Shading.BackgroundPatternColor = wdColorGray25
+
+    Else
         
-  'labels the picture with a string
+'labels the picture with a string
     .Cell(row, col).Range.InsertAfter holdSerialStr & ": " & holdTempStr & ", " & holdVoltageStr & ", " & individualAmpStr(iteration Mod 16)
 
 'initial insert of the picture in the cell
@@ -168,6 +174,8 @@ Sub AutomateTable()
     Set imageOfTest = objShape.ConvertToInlineShape
      
     iteration = iteration + 1
+
+    End If
 
     Next
     Next
@@ -245,12 +253,12 @@ Sub GrantAccess()
 'obtain all the file names of interest to grant permission in one click
 
 
-    For tableN = 1 To 99
-   
+    For tableN = 1 To 297
+  
     iter = 0
 
 
-    For r = 1 To 16
+    For r = 1 To 6
     For c = 1 To 3
 
 'finds the corresponding unit number based on the iteration, and uses this number to get the cooresponding unit string (used for path)
@@ -264,12 +272,19 @@ Sub GrantAccess()
     testNum = getTestNum(iter)
 
    
+    If iter >= 16 Then
+    Debug.Print ("Grey cell")
+
+    Else
 
     fileCandidates(count) = "/Users/k3go/Desktop/BackUp/" & folderStr & "/" & unitStr & "/" & voltStr & "/" & testNum & "." & unitNum & " " & voltStr & " " & picStr(iter Mod 16)
     Debug.Print (fileCandidates(count))
     iter = iter + 1
     count = count + 1
     
+
+    End If
+
     Next
     Next
     Next
@@ -309,13 +324,13 @@ Function getVoltageStr(tableNum As Integer) As String
 
     Dim holdVoltStr As String
     
-    If (tableNum >= 1 And tableNum <= 11) Or (tableNum >= 34 And tableNum <= 44) Or (tableNum >= 67 And tableNum <= 77) Then
+    If (tableNum >= 1 And tableNum <= 33) Or (tableNum >= 100 And tableNum <= 132) Or (tableNum >= 199 And tableNum <= 231) Then
     holdVoltStr = "2.7V"
     
-    ElseIf (tableNum >= 12 And tableNum <= 22) Or (tableNum >= 45 And tableNum <= 55) Or (tableNum >= 78 And tableNum <= 88) Then
+    ElseIf (tableNum >= 34 And tableNum <= 66) Or (tableNum >= 133 And tableNum <= 165) Or (tableNum >= 232 And tableNum <= 264) Then
     holdVoltStr = "3.0V"
 
-    ElseIf (tableNum >= 23 And tableNum <= 33) Or (tableNum >= 56 And tableNum <= 66) Or (tableNum >= 89 And tableNum <= 99) Then
+    ElseIf (tableNum >= 67 And tableNum <= 99) Or (tableNum >= 166 And tableNum <= 198) Or (tableNum >= 265 And tableNum <= 297) Then
     holdVoltStr = "3.2V"
 
     Else
@@ -333,37 +348,37 @@ Function getSerialNum(tableNum As Integer) As String
 
     Dim serial As String
 
-    If tableNum = 1 Or tableNum = 12 Or tableNum = 23 Or tableNum = 34 Or tableNum = 45 Or tableNum = 56 Or tableNum = 67 Or tableNum = 78 Or tableNum = 89 Then
+    If tableNum = 1 Or tableNum = 12 Or tableNum = 23 Or tableNum = 34 Or tableNum = 45 Or tableNum = 56 Or tableNum = 67 Or tableNum = 78 Or tableNum = 89 Or tableNum = 100 Or tableNum = 111 Or tableNum = 122 Or tableNum = 133 Or tableNum = 144 Or tableNum = 155 Or tableNum = 166 Or tableNum = 177 Or tableNum = 188 Or tableNum = 199 Or tableNum = 210 Or tableNum = 221 Or tableNum = 232 Or tableNum = 243 Or tableNum = 254 Or tableNum = 265 Or tableNum = 276 Or tableNum = 287 Then
     serial = "000654"
 
-    ElseIf tableNum = 2 Or tableNum = 13 Or tableNum = 24 Or tableNum = 35 Or tableNum = 46 Or tableNum = 57 Or tableNum = 68 Or tableNum = 79 Or tableNum = 90 Then
+    ElseIf tableNum = 2 Or tableNum = 13 Or tableNum = 24 Or tableNum = 35 Or tableNum = 46 Or tableNum = 57 Or tableNum = 68 Or tableNum = 79 Or tableNum = 90 Or tableNum = 101 Or tableNum = 112 Or tableNum = 123 Or tableNum = 134 Or tableNum = 145 Or tableNum = 156 Or tableNum = 167 Or tableNum = 178 Or tableNum = 189 Or tableNum = 200 Or tableNum = 211 Or tableNum = 222 Or tableNum = 233 Or tableNum = 244 Or tableNum = 255 Or tableNum = 266 Or tableNum = 277 Or tableNum = 288 Then
     serial = "000655"
 
-    ElseIf tableNum = 3 Or tableNum = 14 Or tableNum = 25 Or tableNum = 36 Or tableNum = 47 Or tableNum = 58 Or tableNum = 69 Or tableNum = 80 Or tableNum = 91 Then
+    ElseIf tableNum = 3 Or tableNum = 14 Or tableNum = 25 Or tableNum = 36 Or tableNum = 47 Or tableNum = 58 Or tableNum = 69 Or tableNum = 80 Or tableNum = 91 Or tableNum = 102 Or tableNum = 113 Or tableNum = 124 Or tableNum = 135 Or tableNum = 146 Or tableNum = 157 Or tableNum = 168 Or tableNum = 179 Or tableNum = 190 Or tableNum = 201 Or tableNum = 212 Or tableNum = 223 Or tableNum = 234 Or tableNum = 245 Or tableNum = 256 Or tableNum = 267 Or tableNum = 278 Or tableNum = 289 Then
     serial = "000656"
     
-    ElseIf tableNum = 4 Or tableNum = 15 Or tableNum = 26 Or tableNum = 37 Or tableNum = 48 Or tableNum = 59 Or tableNum = 70 Or tableNum = 81 Or tableNum = 92 Then
+    ElseIf tableNum = 4 Or tableNum = 15 Or tableNum = 26 Or tableNum = 37 Or tableNum = 48 Or tableNum = 59 Or tableNum = 70 Or tableNum = 81 Or tableNum = 92 Or tableNum = 103 Or tableNum = 114 Or tableNum = 125 Or tableNum = 136 Or tableNum = 147 Or tableNum = 158 Or tableNum = 169 Or tableNum = 180 Or tableNum = 191 Or tableNum = 202 Or tableNum = 213 Or tableNum = 224 Or tableNum = 235 Or tableNum = 246 Or tableNum = 257 Or tableNum = 268 Or tableNum = 279 Or tableNum = 290 Then
     serial = "000657"
 
-    ElseIf tableNum = 5 Or tableNum = 16 Or tableNum = 27 Or tableNum = 38 Or tableNum = 49 Or tableNum = 60 Or tableNum = 71 Or tableNum = 82 Or tableNum = 93 Then
+    ElseIf tableNum = 5 Or tableNum = 16 Or tableNum = 27 Or tableNum = 38 Or tableNum = 49 Or tableNum = 60 Or tableNum = 71 Or tableNum = 82 Or tableNum = 93 Or tableNum = 104 Or tableNum = 115 Or tableNum = 126 Or tableNum = 137 Or tableNum = 148 Or tableNum = 159 Or tableNum = 170 Or tableNum = 181 Or tableNum = 192 Or tableNum = 203 Or tableNum = 214 Or tableNum = 225 Or tableNum = 236 Or tableNum = 247 Or tableNum = 258 Or tableNum = 269 Or tableNum = 280 Or tableNum = 291 Then
     serial = "000658"
 
-    ElseIf tableNum = 6 Or tableNum = 17 Or tableNum = 28 Or tableNum = 39 Or tableNum = 50 Or tableNum = 61 Or tableNum = 72 Or tableNum = 83 Or tableNum = 94 Then
+    ElseIf tableNum = 6 Or tableNum = 17 Or tableNum = 28 Or tableNum = 39 Or tableNum = 50 Or tableNum = 61 Or tableNum = 72 Or tableNum = 83 Or tableNum = 94 Or tableNum = 105 Or tableNum = 116 Or tableNum = 127 Or tableNum = 138 Or tableNum = 149 Or tableNum = 160 Or tableNum = 171 Or tableNum = 182 Or tableNum = 193 Or tableNum = 204 Or tableNum = 215 Or tableNum = 226 Or tableNum = 237 Or tableNum = 248 Or tableNum = 259 Or tableNum = 270 Or tableNum = 281 Or tableNum = 292 Then
     serial = "000659"
 
-    ElseIf tableNum = 7 Or tableNum = 18 Or tableNum = 29 Or tableNum = 40 Or tableNum = 51 Or tableNum = 62 Or tableNum = 73 Or tableNum = 84 Or tableNum = 95 Then
+    ElseIf tableNum = 7 Or tableNum = 18 Or tableNum = 29 Or tableNum = 40 Or tableNum = 51 Or tableNum = 62 Or tableNum = 73 Or tableNum = 84 Or tableNum = 95 Or tableNum = 106 Or tableNum = 117 Or tableNum = 128 Or tableNum = 139 Or tableNum = 150 Or tableNum = 161 Or tableNum = 172 Or tableNum = 183 Or tableNum = 194 Or tableNum = 205 Or tableNum = 216 Or tableNum = 227 Or tableNum = 238 Or tableNum = 249 Or tableNum = 260 Or tableNum = 271 Or tableNum = 282 Or tableNum = 293 Then
     serial = "000660"
 
-    ElseIf tableNum = 8 Or tableNum = 19 Or tableNum = 30 Or tableNum = 41 Or tableNum = 52 Or tableNum = 63 Or tableNum = 74 Or tableNum = 85 Or tableNum = 96 Then
+    ElseIf tableNum = 8 Or tableNum = 19 Or tableNum = 30 Or tableNum = 41 Or tableNum = 52 Or tableNum = 63 Or tableNum = 74 Or tableNum = 85 Or tableNum = 96 Or tableNum = 107 Or tableNum = 118 Or tableNum = 129 Or tableNum = 140 Or tableNum = 151 Or tableNum = 162 Or tableNum = 173 Or tableNum = 184 Or tableNum = 195 Or tableNum = 206 Or tableNum = 217 Or tableNum = 228 Or tableNum = 239 Or tableNum = 250 Or tableNum = 261 Or tableNum = 272 Or tableNum = 283 Or tableNum = 294 Then
     serial = "000661"
 
-    ElseIf tableNum = 9 Or tableNum = 20 Or tableNum = 31 Or tableNum = 42 Or tableNum = 53 Or tableNum = 64 Or tableNum = 75 Or tableNum = 86 Or tableNum = 97 Then
+    ElseIf tableNum = 9 Or tableNum = 20 Or tableNum = 31 Or tableNum = 42 Or tableNum = 53 Or tableNum = 64 Or tableNum = 75 Or tableNum = 86 Or tableNum = 97 Or tableNum = 108 Or tableNum = 119 Or tableNum = 130 Or tableNum = 141 Or tableNum = 152 Or tableNum = 163 Or tableNum = 174 Or tableNum = 185 Or tableNum = 196 Or tableNum = 207 Or tableNum = 218 Or tableNum = 229 Or tableNum = 240 Or tableNum = 251 Or tableNum = 262 Or tableNum = 273 Or tableNum = 284 Or tableNum = 295 Then
     serial = "000662"
 
-    ElseIf tableNum = 10 Or tableNum = 21 Or tableNum = 32 Or tableNum = 43 Or tableNum = 54 Or tableNum = 65 Or tableNum = 76 Or tableNum = 87 Or tableNum = 98 Then
+    ElseIf tableNum = 10 Or tableNum = 21 Or tableNum = 32 Or tableNum = 43 Or tableNum = 54 Or tableNum = 65 Or tableNum = 76 Or tableNum = 87 Or tableNum = 98 Or tableNum = 109 Or tableNum = 120 Or tableNum = 131 Or tableNum = 142 Or tableNum = 153 Or tableNum = 164 Or tableNum = 175 Or tableNum = 186 Or tableNum = 197 Or tableNum = 208 Or tableNum = 219 Or tableNum = 230 Or tableNum = 241 Or tableNum = 252 Or tableNum = 263 Or tableNum = 274 Or tableNum = 285 Or tableNum = 296 Then
     serial = "000663"
 
-    ElseIf tableNum = 11 Or tableNum = 22 Or tableNum = 33 Or tableNum = 44 Or tableNum = 55 Or tableNum = 66 Or tableNum = 77 Or tableNum = 88 Or tableNum = 99 Then
+    ElseIf tableNum = 11 Or tableNum = 22 Or tableNum = 33 Or tableNum = 44 Or tableNum = 55 Or tableNum = 66 Or tableNum = 77 Or tableNum = 88 Or tableNum = 99 Or tableNum = 110 Or tableNum = 121 Or tableNum = 132 Or tableNum = 143 Or tableNum = 154 Or tableNum = 165 Or tableNum = 176 Or tableNum = 187 Or tableNum = 198 Or tableNum = 209 Or tableNum = 220 Or tableNum = 231 Or tableNum = 242 Or tableNum = 253 Or tableNum = 264 Or tableNum = 275 Or tableNum = 286 Or tableNum = 297 Then
     serial = "000664"
 
     Else
@@ -381,10 +396,10 @@ Function getTempStr(tableNum As Integer) As String
     
     Dim temp As String
     
-    If tableNum <= 33 Then
+    If tableNum <= 99 Then
     temp = "37°C"
 
-    ElseIf tableNum <= 66 Then
+    ElseIf tableNum <= 198 Then
     temp = "45°C"
 
     Else
@@ -493,10 +508,10 @@ Function getDegreeFolder(tableNum As Integer) As String
 
     Dim tableFolderStr As String
 
-    If tableNum <= 33 Then
+    If tableNum <= 99 Then
     tableFolderStr = "BackUp37"
 
-    ElseIf tableNum <= 66 Then
+    ElseIf tableNum <= 198 Then
     tableFolderStr = "BackUp45"
    
     Else
